@@ -13,6 +13,7 @@ class userMenu {
   bool attemptLogin(void);
   bool createUser(void);
   bool selectHash(void);
+  int validateInput(std::string input);
 
 public:
   userMenu(io_hander &io) : io(io){};

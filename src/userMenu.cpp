@@ -9,19 +9,11 @@
 
 void userMenu::menu(void) {
   std::string input;
-  size_t index;
-  int result;
   while (1) {
     std::cout << "1. Add User\n2. Login\n3. Exit\n";
     std::getline(std::cin, input);
-    index = input.find_first_of("0123456789");
-    if (index != std::string::npos) {
-      result = stoi(input.substr(index, 1));
-    } else {
-      result = 0;
-    }
 
-    switch (result) {
+    switch (this->validateInput(input)) {
     case addUser:
       this->createUser();
       break;
@@ -37,6 +29,15 @@ void userMenu::menu(void) {
     }
   }
   return;
+}
+
+int userMenu::validateInput(std::string input) {
+  int result = 0;
+  size_t index = input.find_first_of("0123456789");
+  if (index != std::string::npos) {
+    result = stoi(input.substr(index, 1));
+  }
+  return result;
 }
 
 bool userMenu::attemptLogin(void) {
