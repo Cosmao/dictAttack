@@ -1,5 +1,6 @@
 #include "headers/md5.h"
 #include <cstdint>
+#include <iostream>
 const std::uint32_t md5::s[64] = {
     7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
     5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20,
@@ -19,7 +20,50 @@ const std::uint32_t md5::k[64] = {
     0xffeff47d, 0x85845dd1, 0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
     0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
 
-const std::uint32_t md5::a0 = 0x67452301;
-const std::uint32_t md5::b0 = 0xefcdab89;
-const std::uint32_t md5::c0 = 0x98badcfe;
-const std::uint32_t md5::d0 = 0x10325476;
+std::uint32_t md5::rotateLeft(std::uint32_t x, std::uint32_t n) {
+  return ((x) << n) | ((x) >> (32 - n));
+}
+
+std::string md5::hashString(std::string stringToHash) {
+  std::string hash;
+  std::uint32_t m[16] = {0x80000000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                         0x00,       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  std::uint32_t a, b, c, d;
+  d = this->c0;
+  c = this->b0;
+  b = this->a0;
+  a = this->d0;
+
+  for (int i = 0; i < 64; i++) {
+    std::uint32_t f, g;
+    if (i < 16) {
+      f = (b & c) | ((~b) & d);
+      g = i;
+    } else if (i < 32) {
+      f = (d & b) | ((~d) & c);
+      g = ((5 * i) + 1) % 16;
+    } else if (i < 48) {
+      f = b ^ c ^ d;
+      g = ((3 * i) + 5) % 16;
+    } else {
+      f = c ^ (b | (~d));
+      g = ((7 * i)) % 16;
+    }
+    f = f + a + this->k[i] + m[g];
+    a = d;
+    d = c;
+    c = b;
+    b += b + this->rotateLeft(f, this->s[i]);
+  }
+
+  this->a0 = this->a0 + a;
+  this->b0 = this->b0 + b;
+  this->c0 = this->c0 + c;
+  this->d0 = this->d0 + d;
+
+  std::cout << std::hex << this->a0 << std::hex << this->b0 << std::hex
+            << this->c0 << std::hex << this->d0 << "\n"
+            << std::endl;
+
+  return stringToHash;
+}
