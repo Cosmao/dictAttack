@@ -6,7 +6,6 @@
 class io_hander {
 private:
   std::string filePath;
-  bool fileOpen = false;
 
 public:
   io_hander(std::string filePath) : filePath(filePath){};
