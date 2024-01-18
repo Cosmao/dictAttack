@@ -18,3 +18,8 @@ const std::uint32_t md5::k[64] = {
     0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92,
     0xffeff47d, 0x85845dd1, 0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
     0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
+
+const std::uint32_t md5::a0 = 0x67452301;
+const std::uint32_t md5::b0 = 0xefcdab89;
+const std::uint32_t md5::c0 = 0x98badcfe;
+const std::uint32_t md5::d0 = 0x10325476;
