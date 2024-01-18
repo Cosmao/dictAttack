@@ -23,17 +23,16 @@ const std::uint32_t md5::k[64] = {
     0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
 
 std::uint32_t md5::rotateLeft(std::uint32_t x, std::uint32_t n) {
-  return ((x) << n) | ((x) >> (32 - n));
+  return (x << n) | (x >> (32 - n));
 }
 
-std::string md5::hashString(std::string stringToHash) {
+void md5::hashString(std::string stringToHash) {
   std::string hash;
-  std::uint32_t m[30];
-  for(int i = 1; i < 30; i++){
+  std::uint32_t m[16];
+  for(int i = 1; i < 16; i++){
     m[i] = 0;
   }
   m[0] = 1 << 31;
-  std::cout << 56 % 64 << " len\n";
   std::uint32_t a, b, c, d;
   d = this->c0;
   c = this->b0;
@@ -71,5 +70,5 @@ std::string md5::hashString(std::string stringToHash) {
             << this->c0 << std::hex << this->d0 << "\n"
             << std::endl;
 
-  return stringToHash;
+  return;
 }
