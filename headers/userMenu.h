@@ -10,11 +10,14 @@ class userMenu {
   // TODO: reference instead maybe?
   hashing *hash;
 
-public:
-  userMenu(io_hander &io) : io(io){};
   bool attemptLogin(void);
   bool createUser(void);
   bool selectHash(void);
+
+public:
+  userMenu(io_hander &io) : io(io){};
+  ~userMenu(void);
+  void menu(void);
 };
 
 #endif // !userMenu_h
