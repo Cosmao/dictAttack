@@ -1,6 +1,5 @@
 #include "headers/md5.h"
 #include <cstdint>
-#include <cstring>
 #include <iostream>
 
 const std::uint32_t md5::s[64] = {
@@ -26,13 +25,20 @@ std::uint32_t md5::rotateLeft(std::uint32_t x, std::uint32_t n) {
   return (x << n) | (x >> (32 - n));
 }
 
-void md5::hashString(std::string stringToHash) {
+std::string md5::hashString(std::string stringToHash) {
   std::string hash;
-  std::uint32_t m[16];
-  for(int i = 1; i < 16; i++){
+  std::string letter = "a";
+  const char *array = letter.c_str();
+  std::uint32_t test = array[0] << (8*3 - 1);// | 1 << ((8 * 2) + 7);
+  test = 0x61008000;
+  std::cout << std::hex << test << "\n";
+
+  #define len 14+16
+  std::uint32_t m[len];
+  for (int i = 1; i < len; i++) {
     m[i] = 0;
   }
-  m[0] = 1 << 31;
+  m[0] = test;//1 << 31;
   std::uint32_t a, b, c, d;
   d = this->c0;
   c = this->b0;
@@ -70,5 +76,5 @@ void md5::hashString(std::string stringToHash) {
             << this->c0 << std::hex << this->d0 << "\n"
             << std::endl;
 
-  return;
+  return stringToHash; 
 }
