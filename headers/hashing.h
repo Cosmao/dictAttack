@@ -4,7 +4,7 @@
 #include <string>
 
 class hashing {
-  virtual std::string hashString(std::string) = 0;
+  virtual std::string hashString(const std::string &str) = 0;
 };
 
 #endif // !hashing_h

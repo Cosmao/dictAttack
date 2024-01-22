@@ -25,7 +25,7 @@ std::uint32_t myMD5::rotateLeft(std::uint32_t x, std::uint32_t n) {
   return (x << n) | (x >> (32 - n));
 }
 
-std::string myMD5::hashString(std::string stringToHash) {
+std::string myMD5::hashString(const std::string &stringToHash) {
   std::string hash;
   std::string letter = "a";
   const char *array = letter.c_str();

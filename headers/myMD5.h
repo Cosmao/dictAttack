@@ -16,7 +16,7 @@ private:
   std::uint32_t rotateLeft(std::uint32_t x, std::uint32_t n);
 
 public:
-  std::string hashString(std::string stringToHash);
+  std::string hashString(const std::string &str);
 };
 
 #endif // !md5_h
