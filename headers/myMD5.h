@@ -4,10 +4,10 @@
 #include "headers/hashing.h"
 #include <cstdint>
 
-class md5 : public hashing {
+class myMD5 : public hashing {
 private:
-  static const std::uint32_t s[64];
-  static const std::uint32_t k[64];
+  static const std::uint32_t s[];
+  static const std::uint32_t k[];
   std::uint32_t a0 = 0x67452301;
   std::uint32_t b0 = 0xefcdab89;
   std::uint32_t c0 = 0x98badcfe;

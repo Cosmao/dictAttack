@@ -8,7 +8,7 @@ endif()
 set(SOURCE_FILES 
   src/main.cpp
   src/io.cpp
-  src/md5.cpp
+  src/myMD5.cpp
   src/userMenu.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES}) 
 set(CMAKE_CXX_STANDARD 23)
