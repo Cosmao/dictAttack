@@ -3,6 +3,8 @@
 
 #include "headers/hashing.h"
 #include "headers/io.h"
+#include <iostream>
+#include <string>
 
 class userMenu {
   io_hander &io;
