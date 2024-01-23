@@ -5,7 +5,7 @@ set(OPENSSL_USE_STATIC_LIBS true)
 find_package(OpenSSL REQUIRED)
 set(SOURCE_FILES 
   src/main.cpp
-  src/io.cpp
+  src/io_file.cpp
   # src/myMD5.cpp
   src/openSSL_MD5.cpp
   src/userMenu.cpp)
