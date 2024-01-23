@@ -8,8 +8,7 @@
 
 class userMenu {
   io_hander &io;
-  // TODO: reference instead maybe?
-  hashing *hash;
+  hashing &hash;
 
   bool attemptLogin(void);
   bool createUser(void);
@@ -17,9 +16,10 @@ class userMenu {
   int validateInput(std::string input);
 
 public:
-  userMenu(io_hander &io) : io(io){};
+  userMenu(io_hander &io, hashing &hash) : io(io), hash(hash){};
   ~userMenu(void);
   void menu(void);
+  void changeHashType(void);
 };
 
 #endif // !userMenu_h

@@ -1,7 +1,4 @@
 #include "headers/userMenu.h"
-#include "headers/io.h"
-#include <iostream>
-#include <string>
 
 #define addUser 1
 #define login 2

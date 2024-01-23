@@ -8,10 +8,10 @@
 
 int main(void) {
   io_hander io = *new io_hander(filePath);
-  userMenu menu = *new userMenu(io);
-  openSSL_MD5 hash;
+  openSSL_MD5 md5Hasher;
+  userMenu menu = *new userMenu(io, md5Hasher);
   std::string input = "The quick brown fox jumps over the lazy dog";
-  std::string hashed = hash.hashString(input);
+  std::string hashed = md5Hasher.hashString(input);
 
   std::cout << "Original: " << input << "\n";
   std::cout << "Hashed: " << hashed << "\n";
