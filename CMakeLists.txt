@@ -11,11 +11,14 @@ set(SOURCE_FILES
   # src/myMD5.cpp
   src/openSSL_MD5.cpp
   src/openSSL_SHA256.cpp
+  src/openSSL_EVP.cpp
   src/userMenu.cpp)
 
 find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
 if(CMAKE_CXX_CPPCHECK)
   list(APPEND CMAKE_CXX_CPPCHECK
+    "--dump"
+    "--quiet"
     "--enable=all"
     "--suppress=missingIncludeSystem"
     "--project=compile_commands.json"
