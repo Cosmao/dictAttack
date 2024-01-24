@@ -8,9 +8,6 @@ find_package(OpenSSL REQUIRED)
 set(SOURCE_FILES 
   src/main.cpp
   src/io_file.cpp
-  # src/myMD5.cpp
-  src/openSSL_MD5.cpp
-  src/openSSL_SHA256.cpp
   src/openSSL_EVP.cpp
   src/userMenu.cpp)
 
