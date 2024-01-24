@@ -4,12 +4,24 @@ include_directories(${PROJECT_SOURCE_DIR})
 set(CMAKE_CXX_STANDARD 23)
 set(OPENSSL_USE_STATIC_LIBS true)
 find_package(OpenSSL REQUIRED)
+
 set(SOURCE_FILES 
   src/main.cpp
   src/io_file.cpp
   # src/myMD5.cpp
   src/openSSL_MD5.cpp
+  src/openSSL_SHA256.cpp
   src/userMenu.cpp)
+
+find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+if(CMAKE_CXX_CPPCHECK)
+  list(APPEND CMAKE_CXX_CPPCHECK
+    "--enable=all"
+    "--suppress=missingIncludeSystem"
+    "--project=compile_commands.json"
+    )
+endif()
+
 add_executable(${PROJECT_NAME} ${SOURCE_FILES}) 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Werror -pedantic -Wno-deprecated-declarations")
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::applink)
