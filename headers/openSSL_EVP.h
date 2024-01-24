@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <openssl/evp.h>
 #include <string>
+#include <vector>
 
 enum hashMethods { MD5_Hash, SHA256_Hash, SHA512_Hash };
 

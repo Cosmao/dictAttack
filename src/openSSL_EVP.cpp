@@ -1,6 +1,4 @@
 #include "headers/openSSL_EVP.h"
-#include <openssl/evp.h>
-#include <vector>
 
 EVP_Hash::EVP_Hash(hashMethods hashMethod) {
   switch (hashMethod) {
@@ -13,9 +11,6 @@ EVP_Hash::EVP_Hash(hashMethods hashMethod) {
   case SHA512_Hash:
     this->hashMethod = EVP_get_digestbyname("sha512");
     break;
-    // default:
-    //   this->hashMethod = EVP_get_digestbyname("sha256");
-    //   break;
   }
 }
 
