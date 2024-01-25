@@ -4,12 +4,14 @@
 #include <format>
 #include <iostream>
 
-#define filePath "filePath"
+#define filePath_pw "common_pw.txt"
+#define filePath_hashed "hashes.txt"
 
 int main(void) {
-  io_file file(filePath);
+  io_file hashed_files(filePath_hashed);
+  io_file common_pw(filePath_pw);
   EVP_Hash EVP_Hasher(MD5_Hash);
-  userMenu menu(file, EVP_Hasher);
+  userMenu menu(hashed_files, common_pw, EVP_Hasher);
   menu.menu();
   std::string input = "The quick brown fox jumps over the lazy dog";
   std::string evpHash = EVP_Hasher.hashString(input);
