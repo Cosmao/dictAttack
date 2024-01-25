@@ -32,7 +32,7 @@ int userMenu::validateInput(std::string input) {
   int result = 0;
   size_t index = input.find_first_of("0123456789");
   if (index != std::string::npos) {
-    result = stoi(input.substr(index, 1));
+    result = std::stoi(input.substr(index, 1));
   }
   return result;
 }
