@@ -8,8 +8,7 @@
 
 class userMenu {
 private:
-  io &io_hashed_list;
-  io &io_common_PW_list;
+  io &usersFile;
   EVP_Hash &hash;
 
   bool attemptLogin(void);
@@ -17,14 +16,17 @@ private:
   bool selectHash(void);
   int validateInput(std::string input);
   void findPW(void);
-  void crackPW(const std::string &hashStr, const std::string &saltStr);
+  std::string findUser(std::string userName);
+  bool verifyPW(const std::string &hash, const std::string &salt,
+                          const std::string &password);
+    // void crackPW(const std::string &hashStr, const std::string &saltStr);
 
-public:
-  userMenu(io &io_hashed, io &io_pw_list, EVP_Hash &hash)
-      : io_hashed_list(io_hashed), io_common_PW_list(io_pw_list), hash(hash){};
-  ~userMenu(void);
-  void menu(void);
-  void changeHashType(void);
-};
+  public:
+    userMenu(io & usersFilePath, EVP_Hash & hash)
+        : usersFile(usersFilePath), hash(hash){};
+    ~userMenu(void);
+    void menu(void);
+    void changeHashType(void);
+  };
 
 #endif // !userMenu_h

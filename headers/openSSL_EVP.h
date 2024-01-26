@@ -12,7 +12,7 @@ class EVP_Hash {
 private:
   int currentHashMethod = 0;
   const EVP_MD *hashMethod;
-  std::string stringifyTest(const std::vector<unsigned char> &charVec);
+  std::string stringifyDigest(const std::vector<unsigned char> &charVec);
 
 public:
   explicit EVP_Hash(hashMethods hashMethod);

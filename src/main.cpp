@@ -6,12 +6,14 @@
 
 #define filePath_pw "../../common_pw.txt"
 #define filePath_hashed "../../hashes.txt"
+#define filePath_usr "../../users.txt"
 
 int main(void) {
   io_file hashed_files(filePath_hashed);
   io_file common_pw(filePath_pw);
+  io_file users_list(filePath_usr);
   EVP_Hash EVP_Hasher(MD5_Hash);
-  userMenu menu(hashed_files, common_pw, EVP_Hasher);
+  userMenu menu(users_list, EVP_Hasher);
   menu.menu();
   // std::string input = "The quick brown fox jumps over the lazy dog";
   // std::string evpHash = EVP_Hasher.hashString(input);

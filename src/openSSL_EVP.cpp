@@ -38,12 +38,12 @@ std::string EVP_Hash::hashString(const std::string &stringToHash) {
   EVP_DigestUpdate(mdctx, stringToHash.c_str(), stringToHash.size());
   EVP_DigestFinal_ex(mdctx, digest.data(), nullptr);
 
-  result = this->stringifyTest(digest);
+  result = this->stringifyDigest(digest);
   EVP_MD_CTX_free(mdctx);
   return result;
 }
 
-std::string EVP_Hash::stringifyTest(const std::vector<unsigned char> &charVec) {
+std::string EVP_Hash::stringifyDigest(const std::vector<unsigned char> &charVec) {
   std::string hash;
   const char *arr = "0123456789abcdef";
   for (const auto &v : charVec) {
