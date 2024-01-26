@@ -78,7 +78,8 @@ void userMenu::crackPW(const std::string &hashStr, const std::string &saltStr) {
       this->io_common_PW_list.reset();
       return;
     } else {
-      std::cout << std::format("Hash: {}\nHashedStr: {}\n", hashStr, hashedString);
+      std::cout << std::format("Hash: {}\nHashedStr: {}\n", hashStr,
+                               hashedString);
     }
   }
   this->io_common_PW_list.reset();
