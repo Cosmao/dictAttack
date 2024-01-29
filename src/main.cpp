@@ -9,8 +9,8 @@
 #define filePath_usr "../../users.txt"
 
 int main(void) {
-  io_file hashed_files(filePath_hashed);
-  io_file common_pw(filePath_pw);
+  // io_file hashed_files(filePath_hashed);
+  // io_file common_pw(filePath_pw);
   io_file users_list(filePath_usr);
   EVP_Hash EVP_Hasher(MD5_Hash);
   userMenu menu(users_list, EVP_Hasher);
@@ -18,7 +18,7 @@ int main(void) {
   // std::string input = "The quick brown fox jumps over the lazy dog";
   // std::string evpHash = EVP_Hasher.hashString(input);
   // std::string evpHashTwo = EVP_Hasher.hashString(input);
-  // EVP_Hasher.switchHashMethod(SHA256_Hash);
+  EVP_Hasher.switchHashMethod(SHA256_Hash);
   // std::string evpSwitchTest = EVP_Hasher.hashString(input);
   // EVP_Hasher.switchHashMethod(MD5_Hash);
   // std::string md5Again = EVP_Hasher.hashString(input);

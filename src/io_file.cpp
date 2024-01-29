@@ -1,17 +1,14 @@
 #include "headers/io_file.h"
+#include <format>
+#include <ios>
 #include <string>
 
 io_file::io_file(const std::string &filePath) {
-  this->fileHandle =
-      std::fstream(filePath, std::ios::in | std::ios::out | std::ios::app);
-  if (!this->fileHandle.good()) {
-    // TODO: Probably throw a error here instead
-    std::cout << "filepath bad\n";
-  }
-  std::cout << "Filepath good " << filePath << "\n";
+  this->fileHandle.open(filePath, std::ios::in | std::ios::out | std::ios::app | std::ios::ate);
 }
 
 io_file::~io_file(void) {
+  this->fileHandle << "closing";
   this->fileHandle.close();
   std::cout << "Closed file"
             << "\n";
@@ -20,8 +17,9 @@ io_file::~io_file(void) {
 
 std::string io_file::readLine(void) {
   std::string line;
-  // TODO: Check if stream good
-  std::getline(this->fileHandle, line);
+  if (this->fileHandle.good()) {
+    std::getline(this->fileHandle, line);
+  }
   return line;
 }
 
@@ -31,10 +29,13 @@ bool io_file::hasLine(void) {
   return c != EOF;
 }
 
-bool io_file::writeLine(const std::string &strToWrite){
-  std::cout << "Writing: " + strToWrite << "\n";
-  this->fileHandle.write(strToWrite.c_str(), strToWrite.size());
-
+bool io_file::writeLine(const std::string &strToWrite) {
+  if (this->fileHandle.is_open()) {
+    this->fileHandle.seekp(std::ios_base::end);
+    std::cout << "Writing: " + strToWrite << " " << strToWrite.size() << "\n";
+    this->fileHandle << std::format("{}", strToWrite);
+    this->fileHandle.flush();
+  }
   return true;
 }
 

@@ -16,6 +16,7 @@ void userMenu::menu(void) {
 
     switch (this->validateInput(input)) {
     case addUser:
+      this->usersFile.writeLine("I dont get it");
       this->createUser();
       break;
     case login:
@@ -45,34 +46,58 @@ int userMenu::validateInput(std::string input) {
 }
 
 bool userMenu::attemptLogin(void) {
+  std::string userName;
+  std::cout << "Enter Username: ";
+  std::getline(std::cin, userName);
+  std::string line = this->findUser(userName);
+  if (line.size() > 0) {
+    std::string hash =
+        line.substr(line.find_first_of(','), line.find_last_of(','));
+    std::string salt = line.substr(line.find_last_of(','));
+    std::string password;
+    std::cout << "Enter password: ";
+    std::getline(std::cin, password);
+    if (this->verifyPW(hash, salt, password)) {
+      std::cout << "Valid login\n";
+      return true;
+    }
+    std::cout << "Invalid credentials\n";
+    return false;
+  }
+  return false;
+}
 
-  return 1;
+std::string userMenu::getUserLine(const std::string &outputText) {
+  std::string userName;
+  std::cout << outputText;
+  std::getline(std::cin, userName);
+  return userName;
 }
 
 bool userMenu::createUser(void) {
-  std::string userName;
-  do {
-    std::cout << "Enter a username: ";
-    std::getline(std::cin, userName);
-  } while (userName.find_first_of(',') != std::string::npos &&
-           this->findUser(userName) == "");
-  std::string password;
-  do {
-    std::cout << "Enter a password: ";
-    std::getline(std::cin, password);
-  } while (password.find_first_of(',') != std::string::npos);
+  std::string userName = getUserLine("Enter desired username: ");
+  while (this->findUser(userName) != "") {
+    userName = getUserLine("Enter desired username: ");
+  }
+  std::string password = getUserLine("Enter password: ");
+  while (password.size() == 0) {
+    password = getUserLine("Enter password: ");
+  }
+  // TODO: fixme
   std::string salt = "FixMeLater";
-
-  usersFile.writeLine(std::format("{},{},{}\n", userName,
-                                  hash.hashString(password + salt), salt));
+  std::string line = std::format("{},{},{}\n", userName,
+                                  hasher.hashString(password + salt), salt);
+  (void)usersFile.writeLine(line);
 
   return 1;
 }
 
-std::string userMenu::findUser(std::string userName) {
+std::string userMenu::findUser(const std::string &userName) {
+  usersFile.reset();
   while (usersFile.hasLine()) {
     std::string line = usersFile.readLine();
     std::string user = line.substr(0, line.find_first_of(','));
+    std::cout << "User: " << user << "\n";
     if (user == userName) {
       return line;
     }
@@ -83,7 +108,7 @@ std::string userMenu::findUser(std::string userName) {
 bool userMenu::verifyPW(const std::string &hash, const std::string &salt,
                         const std::string &password) {
   std::string strToHash = password + salt;
-  if (hash == this->hash.hashString(strToHash)) {
+  if (hash == this->hasher.hashString(strToHash)) {
     return true;
   }
   return false;

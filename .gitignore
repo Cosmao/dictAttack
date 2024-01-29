@@ -3,3 +3,6 @@ out/
 src/*.dump
 compile_commands.json
 misrarules.txt
+common_pw.txt
+hashes.txt
+users.txt
