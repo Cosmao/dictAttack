@@ -5,12 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(OPENSSL_USE_STATIC_LIBS true)
 find_package(OpenSSL REQUIRED)
 
-set(SOURCE_FILES 
-  src/main.cpp
-  src/io.cpp
-  src/io_file.cpp
-  src/openSSL_EVP.cpp
-  src/userMenu.cpp)
+file(GLOB src_files CONFIGURE_DEPENDS "src/*.cpp")
 
 find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
 if(CMAKE_CXX_CPPCHECK)
@@ -23,7 +18,7 @@ if(CMAKE_CXX_CPPCHECK)
     )
 endif()
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES}) 
+add_executable(${PROJECT_NAME} ${src_files}) 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Werror -pedantic")
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::applink)
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL)
