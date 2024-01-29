@@ -7,7 +7,7 @@ find_package(OpenSSL REQUIRED)
 
 file(GLOB src_files CONFIGURE_DEPENDS "src/*.cpp")
 
-find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+#[[ find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
 if(CMAKE_CXX_CPPCHECK)
   list(APPEND CMAKE_CXX_CPPCHECK
     "--dump"
@@ -17,6 +17,7 @@ if(CMAKE_CXX_CPPCHECK)
     "--project=compile_commands.json"
     )
 endif()
+]]
 
 add_executable(${PROJECT_NAME} ${src_files}) 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Werror -pedantic")
