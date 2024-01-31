@@ -8,13 +8,13 @@ void userMenu::menu(void) {
   std::string input;
   while (1) {
     std::cout << "1. Add User\n2. Login\n3. Exit\n";
-    std::getline(std::cin, input);
+    (void)std::getline(std::cin, input);
     switch (this->validateInput(input)) {
     case addUser:
-      this->createUser();
+      (void)this->createUser();
       break;
     case login:
-      this->attemptLogin();
+      (void)this->attemptLogin();
       break;
     case quit:
       return;
@@ -40,7 +40,7 @@ int userMenu::validateInput(std::string input) {
 bool userMenu::attemptLogin(void) {
   std::string userName;
   std::cout << "Enter Username: ";
-  std::getline(std::cin, userName);
+  (void)std::getline(std::cin, userName);
   std::string line = this->findUser(userName);
   if (line.size() > 0) {
     std::string hash =
@@ -49,7 +49,7 @@ bool userMenu::attemptLogin(void) {
     std::string salt = line.substr(line.find_last_of(',') + 1);
     std::string password;
     std::cout << "Enter password: ";
-    std::getline(std::cin, password);
+    (void)std::getline(std::cin, password);
     if (this->verifyPW(hash, salt, password)) {
       std::cout << "Valid login\n";
       return true;
@@ -63,7 +63,7 @@ bool userMenu::attemptLogin(void) {
 std::string userMenu::getUserLine(const std::string &outputText) {
   std::string inLine;
   std::cout << outputText;
-  std::getline(std::cin, inLine);
+  (void)std::getline(std::cin, inLine);
   return inLine;
 }
 
@@ -142,10 +142,8 @@ bool userMenu::createUser(void) {
     password = getUserLine("Enter password: ");
   } while (!this->validatePW(password));
   std::string salt = this->generateSalt(userName);
-  std::string line = std::format("{},{},{}", userName,
-                                 hasher.hashString(password + salt), salt);
-  (void)usersFile.writeLine(line);
-  return 1;
+  return usersFile.writeLine(std::format(
+      "{},{},{}", userName, hasher.hashString(password + salt), salt));
 }
 
 std::string userMenu::findUser(const std::string &userName) {

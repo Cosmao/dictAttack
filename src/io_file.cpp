@@ -31,8 +31,9 @@ bool io_file::writeLine(const std::string &strToWrite) {
     this->fileHandle.seekp(std::ios_base::end);
     this->fileHandle << std::format("{}\n", strToWrite);
     this->fileHandle.flush();
+    return true;
   }
-  return true;
+  return false;
 }
 
 void io_file::reset(void) {
