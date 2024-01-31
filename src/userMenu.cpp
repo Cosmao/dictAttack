@@ -67,6 +67,8 @@ std::string userMenu::getUserLine(const std::string &outputText) {
   return inLine;
 }
 
+// NOTE: can I use multiple predicate?
+// not a huge fan of these loops, surely something better here
 bool userMenu::validatePW(const std::string &password) {
   if (password.size() < 8) {
     std::cout << "Password requires at least 8 characters\n";
@@ -105,7 +107,7 @@ bool userMenu::validateUserName(const std::string &userName) {
     return false;
   }
   if (std::ranges::any_of(userName, [](const char &c) { return c == ','; })) {
-    std::cout << "disallowed character \",\" \n";
+    std::cout << "Disallowed character \",\" \n";
     return false;
   }
   // NOTE: Regex works for now, probably not very quick in the end
@@ -117,8 +119,15 @@ bool userMenu::validateUserName(const std::string &userName) {
   return true;
 }
 
-// FIXME: Implement something for salts
-std::string userMenu::generateSalt(void) { return "FixMeLater"; }
+std::string userMenu::generateSalt(const std::string &userName) {
+  auto oldHashMethod = this->hasher.getCurrentHashMethod();
+  this->hasher.switchHashMethod(MD5_Hash);
+  std::string salt = this->hasher.hashString(
+      std::format("Salt for user {}, created {}", userName,
+                  std::chrono::system_clock::now()));
+  this->hasher.switchHashMethod(oldHashMethod);
+  return salt;
+}
 
 // NOTE: I honestly dont like how you get stuck in a loop until you successfully
 // make an account but I dont want you to have to retype and get sent back to
@@ -132,7 +141,7 @@ bool userMenu::createUser(void) {
   do {
     password = getUserLine("Enter password: ");
   } while (!this->validatePW(password));
-  std::string salt = this->generateSalt();
+  std::string salt = this->generateSalt(userName);
   std::string line = std::format("{},{},{}", userName,
                                  hasher.hashString(password + salt), salt);
   (void)usersFile.writeLine(line);

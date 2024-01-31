@@ -1,16 +1,18 @@
 #include "headers/openSSL_EVP.h"
-#include <iostream>
 
 EVP_Hash::EVP_Hash(hashMethods hashMethod) {
   switch (hashMethod) {
   case MD5_Hash:
     this->hashMethod = EVP_get_digestbyname("md5");
+    this->currentHashMethod = MD5_Hash;
     break;
   case SHA256_Hash:
     this->hashMethod = EVP_get_digestbyname("sha256");
+    this->currentHashMethod = SHA256_Hash;
     break;
   case SHA512_Hash:
     this->hashMethod = EVP_get_digestbyname("sha512");
+    this->currentHashMethod = SHA512_Hash;
     break;
   }
 }
@@ -19,12 +21,15 @@ void EVP_Hash::switchHashMethod(hashMethods hashMethod) {
   switch (hashMethod) {
   case MD5_Hash:
     this->hashMethod = EVP_get_digestbyname("md5");
+    this->currentHashMethod = MD5_Hash;
     break;
   case SHA256_Hash:
     this->hashMethod = EVP_get_digestbyname("sha256");
+    this->currentHashMethod = SHA256_Hash;
     break;
   case SHA512_Hash:
     this->hashMethod = EVP_get_digestbyname("sha512");
+    this->currentHashMethod = SHA512_Hash;
     break;
   }
 }
@@ -41,6 +46,10 @@ std::string EVP_Hash::hashString(const std::string &stringToHash) {
   result = this->stringifyDigest(digest);
   EVP_MD_CTX_free(mdctx);
   return result;
+}
+
+hashMethods EVP_Hash::getCurrentHashMethod(void){
+  return this->currentHashMethod;
 }
 
 std::string EVP_Hash::stringifyDigest(const std::vector<unsigned char> &charVec) {

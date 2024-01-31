@@ -5,6 +5,7 @@
 #include "headers/openSSL_EVP.h"
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cstring>
 #include <format>
 #include <iostream>
@@ -23,7 +24,7 @@ private:
   void findPW(void);
   bool validateUserName(const std::string &userName);
   bool validatePW(const std::string &password);
-  std::string generateSalt(void);
+  std::string generateSalt(const std::string &userName);
   std::string getUserLine(const std::string &outputText);
   std::string findUser(const std::string &userName);
   bool verifyPW(const std::string &hash, const std::string &salt,

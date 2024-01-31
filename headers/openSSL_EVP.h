@@ -10,14 +10,14 @@ enum hashMethods { MD5_Hash, SHA256_Hash, SHA512_Hash };
 
 class EVP_Hash {
 private:
-  int currentHashMethod = 0;
+  hashMethods currentHashMethod;
   const EVP_MD *hashMethod;
   std::string stringifyDigest(const std::vector<unsigned char> &charVec);
 
 public:
   explicit EVP_Hash(hashMethods hashMethod);
   void switchHashMethod(hashMethods hashMethod);
-  int getCurrentHashMethod(void);
+  hashMethods getCurrentHashMethod(void);
   std::string hashString(const std::string &stringToHash);
 };
 
