@@ -3,6 +3,10 @@
 
 #include "headers/io.h"
 #include "headers/openSSL_EVP.h"
+#include <algorithm>
+#include <cctype>
+#include <cstring>
+#include <format>
 #include <iostream>
 #include <string>
 
@@ -16,6 +20,7 @@ private:
   bool selectHash(void);
   int validateInput(std::string input);
   void findPW(void);
+  bool validatePW(const std::string &password);
   std::string getUserLine(const std::string &outputText);
   std::string findUser(const std::string &userName);
   bool verifyPW(const std::string &hash, const std::string &salt,

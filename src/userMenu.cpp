@@ -1,7 +1,4 @@
 #include "headers/userMenu.h"
-#include <cstring>
-#include <format>
-#include <string>
 
 #define addUser 1
 #define login 2
@@ -69,12 +66,45 @@ std::string userMenu::getUserLine(const std::string &outputText) {
   return inLine;
 }
 
+bool userMenu::validatePW(const std::string &password) {
+  if (password.size() < 8) {
+    std::cout << "Password requires at least 8 characters\n";
+    return false;
+  }
+  if (!std::ranges::any_of(password,
+                           [](const char &c) { return std::isupper(c); })) {
+    std::cout << "Password requires a upper case character\n";
+    return false;
+  }
+  if (!std::ranges::any_of(password,
+                           [](const char &c) { return !std::isupper(c); })) {
+    std::cout << "Password requires a lower case character\n";
+    return false;
+  }
+  if (!std::ranges::any_of(password,
+                           [](const char &c) { return std::isdigit(c); })) {
+    std::cout << "Password requires a number\n";
+    return false;
+  }
+  if (!std::ranges::any_of(password, [](const char &c) {
+        if (std::isdigit(c) || std::isalpha(c)) {
+          return false;
+        }
+        return true;
+      })) {
+    std::cout << "Password requires a special character\n";
+    return false;
+  }
+  return true;
+}
+
 bool userMenu::createUser(void) {
   std::string userName;
   std::string found;
   do {
     userName = getUserLine("Enter desired Username: ");
     found = this->findUser(userName);
+    //TODO: Make it "email like"
     if (found != "") {
       std::cout << std::format("User name {} is taken\n",
                                found.substr(0, found.find_first_of(',')));
@@ -83,11 +113,7 @@ bool userMenu::createUser(void) {
   std::string password;
   do {
     password = getUserLine("Enter password: ");
-    // TODO: add the required character check here
-    if (password.size() == 0) {
-      std::cout << "Password needs at least 1 character\n";
-    }
-  } while (password.size() == 0);
+  } while (!this->validatePW(password));
   // TODO: fix some actual salt
   std::string salt = "FixMeLater";
   std::string line = std::format("{},{},{}", userName,
