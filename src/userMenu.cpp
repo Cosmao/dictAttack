@@ -170,5 +170,3 @@ bool userMenu::verifyPW(const std::string &hash, const std::string &salt,
   }
   return false;
 }
-
-void userMenu::findPW(void) { return; }

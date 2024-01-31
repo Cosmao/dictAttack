@@ -7,8 +7,6 @@ io_file::io_file(const std::string &filePath) {
 
 io_file::~io_file(void) {
   this->fileHandle.close();
-  std::cout << "Closed file"
-            << "\n";
   return;
 }
 

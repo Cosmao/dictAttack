@@ -21,7 +21,6 @@ private:
   bool createUser(void);
   bool selectHash(void);
   int validateInput(std::string input);
-  void findPW(void);
   bool validateUserName(const std::string &userName);
   bool validatePW(const std::string &password);
   std::string generateSalt(const std::string &userName);
