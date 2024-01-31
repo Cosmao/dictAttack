@@ -1,4 +1,11 @@
 #include "headers/userMenu.h"
+#include <algorithm>
+#include <cctype>
+#include <chrono>
+#include <cstring>
+#include <format>
+#include <iostream>
+#include <regex>
 
 #define addUser 1
 #define login 2
@@ -147,16 +154,16 @@ bool userMenu::createUser(void) {
 }
 
 std::string userMenu::findUser(const std::string &userName) {
-  usersFile.reset();
+  usersFile.resetStreamPos();
   while (usersFile.hasLine()) {
     std::string line = usersFile.readLine();
     std::string user = line.substr(0, line.find_first_of(','));
     if (user == userName) {
-      usersFile.reset();
+      usersFile.resetStreamPos();
       return line;
     }
   }
-  usersFile.reset();
+  usersFile.resetStreamPos();
   return "";
 }
 

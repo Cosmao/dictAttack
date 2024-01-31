@@ -2,7 +2,6 @@
 #define io_file_h
 
 #include "headers/io.h"
-#include <format>
 #include <fstream>
 #include <string>
 
@@ -11,11 +10,11 @@ private:
   std::fstream fileHandle;
 
 public:
-  explicit io_file(const std::string &filePath); // : filePath(filePath){};
+  explicit io_file(const std::string &filePath);
   std::string readLine(void) override;
   bool writeLine(const std::string &strToWrite) override;
   bool hasLine(void) override;
-  void reset(void) override;
+  void resetStreamPos(void) override;
   ~io_file(void);
 };
 

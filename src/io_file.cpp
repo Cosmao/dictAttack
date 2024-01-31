@@ -1,4 +1,5 @@
 #include "headers/io_file.h"
+#include <format>
 
 io_file::io_file(const std::string &filePath) {
   this->fileHandle.open(filePath, std::ios::in | std::ios::out | std::ios::app |
@@ -36,7 +37,7 @@ bool io_file::writeLine(const std::string &strToWrite) {
   return false;
 }
 
-void io_file::reset(void) {
+void io_file::resetStreamPos(void) {
   this->fileHandle.seekg(0, this->fileHandle.beg);
   if (this->fileHandle.eof() && !this->fileHandle.fail() &&
       !this->fileHandle.bad()) {

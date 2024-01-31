@@ -1,7 +1,6 @@
 #ifndef openSSL_EVP_h
 #define openSSL_EVP_h
 
-#include <iomanip>
 #include <openssl/evp.h>
 #include <string>
 #include <vector>
