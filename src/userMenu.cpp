@@ -36,6 +36,7 @@ int userMenu::validateInput(std::string input) {
   return result;
 }
 
+// TODO: Clean this shit up
 bool userMenu::attemptLogin(void) {
   std::string userName;
   std::cout << "Enter Username: ";
@@ -98,24 +99,40 @@ bool userMenu::validatePW(const std::string &password) {
   return true;
 }
 
+bool userMenu::validateUserName(const std::string &userName) {
+  if (this->findUser(userName) != "") {
+    std::cout << "Username is taken\n";
+    return false;
+  }
+  if (std::ranges::any_of(userName, [](const char &c) { return c == ','; })) {
+    std::cout << "disallowed character \",\" \n";
+    return false;
+  }
+  // NOTE: Regex works for now, probably not very quick in the end
+  std::regex emailRegex("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
+  if (!std::regex_search(userName, emailRegex)) {
+    std::cout << "Username needs to be an email address\n";
+    return false;
+  }
+  return true;
+}
+
+// FIXME: Implement something for salts
+std::string userMenu::generateSalt(void) { return "FixMeLater"; }
+
+// NOTE: I honestly dont like how you get stuck in a loop until you successfully
+// make an account but I dont want you to have to retype and get sent back to
+// menu all the time either
 bool userMenu::createUser(void) {
   std::string userName;
-  std::string found;
   do {
     userName = getUserLine("Enter desired Username: ");
-    found = this->findUser(userName);
-    //TODO: Make it "email like"
-    if (found != "") {
-      std::cout << std::format("User name {} is taken\n",
-                               found.substr(0, found.find_first_of(',')));
-    }
-  } while (found != "");
+  } while (!this->validateUserName(userName));
   std::string password;
   do {
     password = getUserLine("Enter password: ");
   } while (!this->validatePW(password));
-  // TODO: fix some actual salt
-  std::string salt = "FixMeLater";
+  std::string salt = this->generateSalt();
   std::string line = std::format("{},{},{}", userName,
                                  hasher.hashString(password + salt), salt);
   (void)usersFile.writeLine(line);
@@ -146,37 +163,3 @@ bool userMenu::verifyPW(const std::string &hash, const std::string &salt,
 }
 
 void userMenu::findPW(void) { return; }
-
-// void userMenu::findPW(void) {
-//   while (this->io_hashed_list.hasLine()) {
-//     std::string line = this->io_hashed_list.readLine();
-//     std::string hashStr;
-//     std::string saltStr;
-//
-//     hashStr = line.substr(0, line.find_first_of(','));
-//     saltStr = line.substr(line.find_first_of(',') + 1, line.size());
-//
-//     std::cout << std::format("Hash: {} Salt: {}\n", hashStr, saltStr);
-//     this->crackPW(hashStr, saltStr);
-//   }
-//   this->io_hashed_list.reset();
-// }
-//
-// void userMenu::crackPW(const std::string &hashStr, const std::string
-// &saltStr) {
-//   while (this->io_common_PW_list.hasLine()) {
-//     std::string pw = this->io_common_PW_list.readLine();
-//     std::string pwSalt = pw + saltStr;
-//     std::string hashedString = this->hash.hashString(pwSalt);
-//     if (hashedString == hashStr) {
-//       std::cout << std::format("Found match!\nHash: {}\nPW: {}\n", hashStr,
-//       pw); this->io_common_PW_list.reset(); return;
-//     } else {
-//       std::cout << std::format("Hash: {}\nHashedStr: {}\n", hashStr,
-//                                hashedString);
-//     }
-//   }
-//   this->io_common_PW_list.reset();
-// }
-//
-userMenu::~userMenu(void) { return; }
