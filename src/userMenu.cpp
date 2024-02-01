@@ -88,16 +88,17 @@ bool userMenu::validatePW(const std::string &password) {
     std::cout << "Password requires at least 8 characters\n";
     return false;
   }
-  for (auto &c : password) {
+  for (const char &c : password) {
     if (isupper(c)) {
       flags |= uppercaseFlag;
-    } else if (isalpha(c) && !isupper(c)) {
+    } else if (isalpha(c)) {
       flags |= lowercaseFlag;
     } else if (isdigit(c)) {
       flags |= numberFlag;
-    } else if (!(isdigit(c) || isalpha(c))) {
+    } else {
       flags |= specialFlag;
     }
+    // NOTE: maybe change to flags = value of all flags?
     if (((flags & uppercaseFlag) == uppercaseFlag) &&
         ((flags & lowercaseFlag) == lowercaseFlag) &&
         ((flags & numberFlag) == numberFlag) &&
