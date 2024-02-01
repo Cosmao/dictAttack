@@ -18,7 +18,11 @@ void userMenu::menu(void) {
     (void)std::getline(std::cin, input);
     switch (this->validateInput(input)) {
     case addUser:
-      (void)this->createUser();
+      if (this->createUser()) {
+        std::cout << "Successfully created account\n";
+      } else {
+        std::cout << "Account creation failed\n";
+      }
       break;
     case login:
       (void)this->attemptLogin();
