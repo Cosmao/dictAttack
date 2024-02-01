@@ -14,3 +14,12 @@ list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Werror -pedantic")
 target_link_libraries(loginProgram PRIVATE OpenSSL::applink)
 target_link_libraries(loginProgram PRIVATE OpenSSL::SSL)
 set_target_properties(loginProgram PROPERTIES OUTPUT_NAME loginProgram.o) 
+
+find_package(Catch2 3 REQUIRED)
+add_executable(tests tests/evp_tests.cpp
+  src/openSSL_EVP.cpp
+  )
+target_compile_features(tests PRIVATE cxx_std_23)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(tests PRIVATE OpenSSL::SSL)
+target_include_directories(tests PRIVATE "${PROJECT_SOURCE_DIR}")
