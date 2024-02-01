@@ -12,6 +12,7 @@ TEST_CASE("Create and read file") {
     test_file.resetStreamPos();
     REQUIRE(test_file.hasLine() == true);
     REQUIRE(test_file.readLine() == "Testing");
+    REQUIRE(test_file.hasLine() == false);
   }
   std::remove(filePath);
 }

@@ -47,28 +47,24 @@ int userMenu::validateInput(std::string input) {
   return result;
 }
 
-// TODO: Clean this shit up
 bool userMenu::attemptLogin(void) {
-  std::string userName;
-  std::cout << "Enter Username: ";
-  (void)std::getline(std::cin, userName);
+  std::string userName = this->getUserLine("Enter UserName: ");
   std::string line = this->findUser(userName);
-  if (line.size() > 0) {
-    std::string hash =
-        line.substr(line.find_first_of(',') + 1,
-                    line.find_last_of(',') - userName.size() - 1);
-    std::string salt = line.substr(line.find_last_of(',') + 1);
-    std::string password;
-    std::cout << "Enter password: ";
-    (void)std::getline(std::cin, password);
-    if (this->verifyPW(hash, salt, password)) {
-      std::cout << "Valid login\n";
-      return true;
-    }
-    std::cout << "Invalid credentials\n";
+  if (line == "") {
+    std::cout << "Invalid username\n";
     return false;
   }
-  return false;
+  std::string password = this->getUserLine("Enter Password: ");
+  std::string salt = line.substr(line.find_last_of(',') + 1);
+  std::string hash = line.substr(line.find_first_of(',') + 1,
+                                 line.find_last_of(',') - userName.size() - 1);
+  if (this->verifyPW(hash, salt, password)) {
+    std::cout << "Valid login\n";
+    return true;
+  } else {
+    std::cout << "Invalid password\n";
+    return false;
+  }
 }
 
 std::string userMenu::getUserLine(const std::string &outputText) {
