@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <format>
 #include <iostream>
@@ -76,36 +77,47 @@ std::string userMenu::getUserLine(const std::string &outputText) {
 
 // NOTE: can I use multiple predicate?
 // not a huge fan of these loops, surely something better here
+// single loop but idfk about it either
 bool userMenu::validatePW(const std::string &password) {
+#define uppercaseFlag 0x1
+#define lowercaseFlag 0x2
+#define numberFlag 0x4
+#define specialFlag 0x8
+  uint8_t flags = 0;
   if (password.size() < 8) {
     std::cout << "Password requires at least 8 characters\n";
     return false;
   }
-  if (!std::ranges::any_of(password,
-                           [](const char &c) { return std::isupper(c); })) {
+  for (auto &c : password) {
+    if (isupper(c)) {
+      flags |= uppercaseFlag;
+    } else if (isalpha(c) && !isupper(c)) {
+      flags |= lowercaseFlag;
+    } else if (isdigit(c)) {
+      flags |= numberFlag;
+    } else if (!(isdigit(c) || isalpha(c))) {
+      flags |= specialFlag;
+    }
+    if (((flags & uppercaseFlag) == uppercaseFlag) &&
+        ((flags & lowercaseFlag) == lowercaseFlag) &&
+        ((flags & numberFlag) == numberFlag) &&
+        ((flags & specialFlag) == specialFlag)) {
+      return true;
+    }
+  }
+  if (!((flags & uppercaseFlag) == uppercaseFlag)) {
     std::cout << "Password requires a upper case character\n";
-    return false;
   }
-  if (!std::ranges::any_of(password,
-                           [](const char &c) { return !std::isupper(c); })) {
-    std::cout << "Password requires a lower case character\n";
-    return false;
+  if (!((flags & lowercaseFlag) == lowercaseFlag)) {
+    std::cout << "Password requires a lower case characer\n";
   }
-  if (!std::ranges::any_of(password,
-                           [](const char &c) { return std::isdigit(c); })) {
+  if (!((flags & numberFlag) == numberFlag)) {
     std::cout << "Password requires a number\n";
-    return false;
   }
-  if (!std::ranges::any_of(password, [](const char &c) {
-        if (std::isdigit(c) || std::isalpha(c)) {
-          return false;
-        }
-        return true;
-      })) {
+  if (!((flags & specialFlag) == specialFlag)) {
     std::cout << "Password requires a special character\n";
-    return false;
   }
-  return true;
+  return false;
 }
 
 bool userMenu::validateUserName(const std::string &userName) {
