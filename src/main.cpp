@@ -8,7 +8,7 @@
 
 #define filePath_usr "../../users.txt"
 #define filePath_commonPW "../../rockyou.txt"
-#define filePath_hashedPW "../../hashedPW.txt"
+#define filePath_hashedPW "../../sortedHashedPW.txt"
 
 void crack(hashMethods hashMethod, const std::string &hashedPW,
            const std::vector<std::string> &commonPW, int start, int end,
@@ -20,6 +20,7 @@ int main(void) {
   io_file commonPW(filePath_commonPW);
   io_file hashedPW(filePath_hashedPW);
   const int numThreads = 16;
+  const int pwToCrack = 100;
 
   // NOTE: ONLY RUN ONCE
   //  hashFile(MD5_Hash, commonPW, hashedPW);
@@ -36,6 +37,7 @@ int main(void) {
   std::mutex boolMutex;
   std::vector<std::thread> threads(numThreads);
   int i = 0;
+  auto start = std::chrono::high_resolution_clock::now();
   while (hashedPW.hasLine()) {
     volatile bool foundPW = false;
     int start = 0;
@@ -46,18 +48,20 @@ int main(void) {
       vThread = std::thread(crack, MD5_Hash, hash, pw, start, end,
                             std::ref(foundPW), std::ref(boolMutex));
       start += amountPerThread;
+      end += amountPerThread;
     }
-    std::cout << std::format("Created {} threads\n", threads.size());
-
     for (auto &vThread : threads) {
       vThread.join();
     }
-    if (i > 10) {
+    i++;
+    if (i >= pwToCrack) {
       break;
     }
-    i++;
   }
-
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::seconds>(end - start);
+  std::cout << std::format("Cracking {} passwords took {} seconds\n", pwToCrack, duration.count());
   return 0;
 }
 
@@ -84,18 +88,15 @@ void crack(hashMethods hashMethod, const std::string &hashedPW,
            const std::vector<std::string> &commonPW, int start, int end,
            volatile bool &foundPW, std::mutex &boolMutex) {
   EVP_Hash hasher(hashMethod);
-  std::cout << std::format("Start: {} End: {} Bool: {}\n", start, end, foundPW ? "True" : "False");
   for (int i = start; i < end; i++) {
     if (hashedPW == hasher.hashString(commonPW.at(i))) {
       std::cout << std::format("Hash: {}\nPassword: {}\n", hashedPW,
                                commonPW.at(i));
-      boolMutex.lock();
+      std::scoped_lock lock(boolMutex);
       foundPW = true;
-      boolMutex.unlock();
       return;
     }
     if (foundPW == true) {
-      std::cout << "early exit\n";
       return;
     }
   }
