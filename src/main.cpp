@@ -1,59 +1,103 @@
 #include "headers/io_file.h"
 #include "headers/openSSL_EVP.h"
-#include "headers/userMenu.h"
-#include <chrono>
+#include <format>
 #include <iostream>
+#include <mutex>
 #include <thread>
+#include <vector>
 
 #define filePath_usr "../../users.txt"
+#define filePath_commonPW "../../rockyou.txt"
+#define filePath_hashedPW "../../hashedPW.txt"
+
+void crack(hashMethods hashMethod, const std::string &hashedPW,
+           const std::vector<std::string> &commonPW, int start, int end,
+           volatile bool &foundPW, std::mutex &boolMutex);
+void hashFile(hashMethods hashMethod, io_file &fileToHash,
+              io_file &fileToStore);
 
 int main(void) {
-  io_file users_list(filePath_usr);
-  EVP_Hash EVP_Hasher(MD5_Hash);
-  userMenu menu(users_list, EVP_Hasher);
-  // menu.menu();
-
+  io_file commonPW(filePath_commonPW);
+  io_file hashedPW(filePath_hashedPW);
   const int numThreads = 16;
-  const int numOfHashesh = 10000000;
-  std::cout << std::format("Number of hashes to compute {}\n", numOfHashesh);
 
+  // NOTE: ONLY RUN ONCE
+  //  hashFile(MD5_Hash, commonPW, hashedPW);
+
+  std::vector<std::string> pw;
+  commonPW.resetStreamPos();
+  hashedPW.resetStreamPos();
+  while (commonPW.hasLine()) {
+    std::string line = commonPW.readLine();
+    pw.push_back(line);
+  }
+
+  int amountPerThread = pw.size() / numThreads;
+  std::mutex boolMutex;
   std::vector<std::thread> threads(numThreads);
-  const std::string hashToCrack = "WOW";
+  int i = 0;
+  while (hashedPW.hasLine()) {
+    volatile bool foundPW = false;
+    int start = 0;
+    int end = start + amountPerThread;
+    std::string hash = hashedPW.readLine();
 
-  auto lambda = [](int loops, const std::string &hash) {
-    EVP_Hash hasher(SHA512_Hash);
-    for (int i = 0; i < loops; i++) {
-      if (hash == hasher.hashString("XD")) {
-        std::cout << "Match found\n";
-        return;
-      }
+    for (auto &vThread : threads) {
+      vThread = std::thread(crack, MD5_Hash, hash, pw, start, end,
+                            std::ref(foundPW), std::ref(boolMutex));
+      start += amountPerThread;
     }
-  };
+    std::cout << std::format("Created {} threads\n", threads.size());
 
-  auto startThread = std::chrono::system_clock::now();
-  for (auto &vThread : threads) {
-    vThread = std::thread(lambda, numOfHashesh / numThreads, hashToCrack);
-  }
-
-  for (auto &vThread : threads) {
-    vThread.join();
-  }
-  auto endThread = std::chrono::system_clock::now();
-  auto elapsedThread = std::chrono::duration_cast<std::chrono::milliseconds>(
-      endThread - startThread);
-  std::cout << std::format("Time: {} milliseconds with {} threads\n",
-                           elapsedThread.count(), numThreads);
-  EVP_Hasher.switchHashMethod(SHA512_Hash);
-  auto start = std::chrono::system_clock::now();
-  for (int i = 0; i < numOfHashesh; i++) {
-    if (hashToCrack == EVP_Hasher.hashString("XD")) {
-      std::cout << "Match found\n";
+    for (auto &vThread : threads) {
+      vThread.join();
     }
+    if (i > 10) {
+      break;
+    }
+    i++;
   }
-  auto end = std::chrono::system_clock::now();
-  auto elapsed =
-      std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-  std::cout << std::format("Time: {} milliseconds without threads\n",
-                           elapsed.count());
+
   return 0;
+}
+
+void hashFile(hashMethods hashMethod, io_file &fileToHash,
+              io_file &fileToStore) {
+
+  // Ingest
+  std::vector<std::string> pw;
+  fileToHash.resetStreamPos();
+  fileToStore.resetStreamPos();
+  while (fileToHash.hasLine()) {
+    std::string line = fileToHash.readLine();
+    pw.push_back(line);
+  }
+  EVP_Hash hashClass(hashMethod);
+  for (auto &password : pw) {
+    fileToStore.writeLine(hashClass.hashString(password));
+  }
+  std::cout << std::format("Hashed {} lines\n", pw.size());
+  return;
+}
+
+void crack(hashMethods hashMethod, const std::string &hashedPW,
+           const std::vector<std::string> &commonPW, int start, int end,
+           volatile bool &foundPW, std::mutex &boolMutex) {
+  EVP_Hash hasher(hashMethod);
+  std::cout << std::format("Start: {} End: {} Bool: {}\n", start, end, foundPW ? "True" : "False");
+  for (int i = start; i < end; i++) {
+    if (hashedPW == hasher.hashString(commonPW.at(i))) {
+      std::cout << std::format("Hash: {}\nPassword: {}\n", hashedPW,
+                               commonPW.at(i));
+      boolMutex.lock();
+      foundPW = true;
+      boolMutex.unlock();
+      return;
+    }
+    if (foundPW == true) {
+      std::cout << "early exit\n";
+      return;
+    }
+  }
+  return;
 }
