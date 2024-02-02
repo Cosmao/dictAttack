@@ -9,7 +9,7 @@ target_compile_features(loginProgram PUBLIC cxx_std_23)
 set_target_properties(loginProgram PROPERTIES OUTPUT_NAME loginProgram.o) 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Werror -pedantic")
 
-set(OPENSSL_USE_STATIC_LIBS true)
+# set(OPENSSL_USE_STATIC_LIBS true)
 find_package(OpenSSL REQUIRED)
 target_link_libraries(loginProgram PRIVATE OpenSSL::applink)
 target_link_libraries(loginProgram PRIVATE OpenSSL::SSL)

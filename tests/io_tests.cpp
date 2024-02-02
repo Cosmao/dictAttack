@@ -14,5 +14,5 @@ TEST_CASE("Create and read file") {
     REQUIRE(test_file.readLine() == "Testing");
     REQUIRE(test_file.hasLine() == false);
   }
-  std::remove(filePath);
+  REQUIRE(std::remove(filePath) == 0);
 }
