@@ -1,14 +1,14 @@
-#include "headers/io_file.h"
-#include "headers/openSSL_EVP.h"
+#include "srcShared/io_file.h"
+#include "srcShared/openSSL_EVP.h"
 #include <format>
 #include <iostream>
 #include <mutex>
 #include <thread>
 #include <vector>
 
-#define filePath_usr "../../users.txt"
-#define filePath_commonPW "../../rockyou.txt"
-#define filePath_hashedPW "../../sortedHashedPW.txt"
+#define filePath_usr "../../../users.txt"
+#define filePath_commonPW "../../../rockyou.txt"
+#define filePath_hashedPW "../../../sortedHashedPW.txt"
 
 void crack(hashMethods hashMethod, const std::string &hashedPW,
            const std::vector<std::string> &commonPW, int start, int end,
@@ -20,7 +20,7 @@ int main(void) {
   io_file commonPW(filePath_commonPW);
   io_file hashedPW(filePath_hashedPW);
   const int numThreads = 16;
-  const int pwToCrack = 100;
+  const int pwToCrack = 10;
 
   // NOTE: ONLY RUN ONCE
   //  hashFile(MD5_Hash, commonPW, hashedPW);

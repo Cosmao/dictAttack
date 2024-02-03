@@ -1,8 +1,8 @@
 #ifndef userMenu_h
 #define userMenu_h
 
-#include "headers/io.h"
-#include "headers/openSSL_EVP.h"
+#include "srcShared/io.h"
+#include "srcShared/openSSL_EVP.h"
 #include <string>
 
 class userMenu {

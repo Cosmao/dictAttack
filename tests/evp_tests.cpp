@@ -1,5 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
-#include "headers/openSSL_EVP.h"
+#include "srcShared/openSSL_EVP.h"
 
 TEST_CASE("EVP md5 Hash"){
   EVP_Hash evp_test(MD5_Hash);
