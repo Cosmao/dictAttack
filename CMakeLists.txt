@@ -4,11 +4,9 @@ project(dictAttack VERSION 1
 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Werror -pedantic")
 
-set(OPENSSL_USE_STATIC_LIBS true)
 find_package(OpenSSL REQUIRED)
 find_package(Catch2 3 REQUIRED)
 
 add_subdirectory(loginMenu)
 add_subdirectory(srcShared)
 add_subdirectory(tests)
-
