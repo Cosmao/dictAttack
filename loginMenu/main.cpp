@@ -32,7 +32,6 @@ int main(void) {
     std::string line = commonPW.readLine();
     pw.push_back(line);
   }
-
   int amountPerThread = pw.size() / numThreads;
   std::mutex boolMutex;
   std::vector<std::thread> threads(numThreads);
@@ -43,7 +42,6 @@ int main(void) {
     int start = 0;
     int end = start + amountPerThread;
     std::string hash = hashedPW.readLine();
-
     for (auto &vThread : threads) {
       vThread = std::thread(crack, MD5_Hash, hash, pw, start, end,
                             std::ref(foundPW), std::ref(boolMutex));
@@ -59,16 +57,14 @@ int main(void) {
     }
   }
   auto end = std::chrono::high_resolution_clock::now();
-  auto duration =
-      std::chrono::duration_cast<std::chrono::seconds>(end - start);
-  std::cout << std::format("Cracking {} passwords took {} seconds\n", pwToCrack, duration.count());
+  auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+  std::cout << std::format("Cracking {} passwords took {} seconds\n", pwToCrack,
+                           duration.count());
   return 0;
 }
 
 void hashFile(hashMethods hashMethod, io_file &fileToHash,
               io_file &fileToStore) {
-
-  // Ingest
   std::vector<std::string> pw;
   fileToHash.resetStreamPos();
   fileToStore.resetStreamPos();
