@@ -6,7 +6,6 @@ list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Werror -pedantic")
 
 find_package(OpenSSL REQUIRED)
 find_package(Catch2 3 REQUIRED)
-# find_package(Qt6 REQUIRED COMPONENTS Core Qt6Widgets)
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
 add_subdirectory(loginMenu)
