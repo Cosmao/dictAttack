@@ -1,4 +1,4 @@
-#include "headers/userMenu.h"
+#include "loginMenu/userMenu.h"
 #include <algorithm>
 #include <cctype>
 #include <chrono>
@@ -8,11 +8,10 @@
 #include <iostream>
 #include <regex>
 
+void userMenu::menu(void) {
 #define addUser 1
 #define login 2
 #define quit 3
-
-void userMenu::menu(void) {
   std::string input;
   while (1) {
     std::cout << "1. Add User\n2. Login\n3. Exit\n";
