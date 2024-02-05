@@ -1,10 +1,21 @@
 cmake_minimum_required(VERSION 3.28.1)
-add_executable(pwCracker 
-  main.cpp
+
+add_executable(pwCrackerGUI 
+  mainGUI.cpp
   )
-target_include_directories(pwCracker PUBLIC "${PROJECT_SOURCE_DIR}")
-target_compile_features(pwCracker PUBLIC cxx_std_23)
-target_link_libraries(pwCracker PRIVATE OpenSSL::SSL)
-target_link_libraries(pwCracker PRIVATE sharedComponents)
-target_link_libraries(pwCracker PRIVATE Qt6::Core)
-target_link_libraries(pwCracker PRIVATE Qt6::Widgets)
+target_include_directories(pwCrackerGUI PUBLIC "${PROJECT_SOURCE_DIR}")
+target_compile_features(pwCrackerGUI PUBLIC cxx_std_23)
+target_link_libraries(pwCrackerGUI PRIVATE OpenSSL::SSL)
+target_link_libraries(pwCrackerGUI PRIVATE sharedComponents)
+target_link_libraries(pwCrackerGUI PRIVATE Qt6::Core)
+target_link_libraries(pwCrackerGUI PRIVATE Qt6::Widgets)
+
+add_executable(pwCrackerCLI
+  mainCLI.cpp
+  )
+target_include_directories(pwCrackerCLI PUBLIC "${PROJECT_SOURCE_DIR}")
+target_compile_features(pwCrackerCLI PUBLIC cxx_std_23)
+target_link_libraries(pwCrackerCLI PRIVATE OpenSSL::SSL)
+target_link_libraries(pwCrackerCLI PRIVATE sharedComponents)
+target_link_libraries(pwCrackerCLI PRIVATE Qt6::Core)
+target_link_libraries(pwCrackerCLI PRIVATE Qt6::Widgets)
