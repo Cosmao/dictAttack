@@ -6,6 +6,10 @@ io_file::io_file(const std::string &filePath) {
                                       std::ios::ate);
 }
 
+bool io_file::is_good(void){
+  return this->fileHandle.good();
+}
+
 io_file::~io_file(void) {
   this->fileHandle.close();
   return;

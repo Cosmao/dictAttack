@@ -15,6 +15,7 @@ public:
   bool writeLine(const std::string &strToWrite) override;
   bool hasLine(void) override;
   void resetStreamPos(void) override;
+  bool is_good(void);
   ~io_file(void);
 };
 

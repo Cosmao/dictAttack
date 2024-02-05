@@ -1,97 +1,35 @@
+#include "pwCracker/cracker.h"
 #include "srcShared/io_file.h"
-#include "srcShared/openSSL_EVP.h"
-#include <format>
 #include <iostream>
-#include <mutex>
-#include <thread>
-#include <vector>
-
-void crack(hashMethods hashMethod, const std::string &hashedPW,
-           const std::vector<std::string> &commonPW, int start, int end,
-           volatile bool &foundPW, std::mutex &boolMutex);
-void hashFile(hashMethods hashMethod, io_file &fileToHash,
-              io_file &fileToStore);
+#include <string>
 
 int main(int argc, char *argv[]) {
-  if(argc != 3){
-    std::cout << "Requires 3 arguments, hashed passwords, common PW file and number of threads\n";
+  if (argc != 4) {
+    std::cout << "Requires 3 arguments, hashed passwords, common PW file and "
+                 "number of threads\n";
+    std::cout << argc << "\n";
     return 0;
   }
-  io_file commonPW();
-  io_file hashedPW();
-  const int numThreads = 16;
-  const int pwToCrack = 10;
+  std::string argOne = argv[1];
+  std::string argTwo = argv[2];
+  std::string argThree = argv[3];
+  io_file commonPW(argTwo);
+  io_file hashedPW(argOne);
+  if (!commonPW.is_good()) {
+    std::cout << "PW filepath bad!\n";
+    return 0;
+  } else {
+    std::cout << "PW filepath good!\n";
+  }
+  if (!hashedPW.is_good()) {
+    std::cout << "Hash filepath bad!\n";
+    return 0;
+  } else {
+    std::cout << "Hash filepath good!\n";
+  }
+  const int numThreads = std::stoi(argThree);
 
-  std::vector<std::string> pw;
-  commonPW.resetStreamPos();
-  hashedPW.resetStreamPos();
-  while (commonPW.hasLine()) {
-    std::string line = commonPW.readLine();
-    pw.push_back(line);
-  }
-  int amountPerThread = pw.size() / numThreads;
-  std::mutex boolMutex;
-  std::vector<std::thread> threads(numThreads);
-  int i = 0;
-  auto start = std::chrono::high_resolution_clock::now();
-  while (hashedPW.hasLine()) {
-    volatile bool foundPW = false;
-    int start = 0;
-    int end = start + amountPerThread;
-    std::string hash = hashedPW.readLine();
-    for (auto &vThread : threads) {
-      vThread = std::thread(crack, MD5_Hash, hash, pw, start, end,
-                            std::ref(foundPW), std::ref(boolMutex));
-      start += amountPerThread;
-      end += amountPerThread;
-    }
-    for (auto &vThread : threads) {
-      vThread.join();
-    }
-    i++;
-    if (i >= pwToCrack) {
-      break;
-    }
-  }
-  auto end = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
-  std::cout << std::format("Cracking {} passwords took {} seconds\n", pwToCrack,
-                           duration.count());
+  crackThreadHandler(hashedPW, commonPW, numThreads);
+
   return 0;
-}
-
-void hashFile(hashMethods hashMethod, io_file &fileToHash,
-              io_file &fileToStore) {
-  std::vector<std::string> pw;
-  fileToHash.resetStreamPos();
-  fileToStore.resetStreamPos();
-  while (fileToHash.hasLine()) {
-    std::string line = fileToHash.readLine();
-    pw.push_back(line);
-  }
-  EVP_Hash hashClass(hashMethod);
-  for (auto &password : pw) {
-    fileToStore.writeLine(hashClass.hashString(password));
-  }
-  std::cout << std::format("Hashed {} lines\n", pw.size());
-  return;
-}
-
-void crack(hashMethods hashMethod, const std::string &hashedPW,
-           const std::vector<std::string> &commonPW, int start, int end,
-           volatile bool &foundPW, std::mutex &boolMutex) {
-  EVP_Hash hasher(hashMethod);
-  for (int i = start; i < end; i++) {
-    if (hashedPW == hasher.hashString(commonPW.at(i))) {
-      std::cout << std::format("Hash: {}\nPassword: {}\n", hashedPW,
-                               commonPW.at(i));
-      std::scoped_lock lock(boolMutex);
-      foundPW = true;
-      return;
-    }
-    if (foundPW == true) {
-      return;
-    }
-  }
-  return;
 }

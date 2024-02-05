@@ -12,10 +12,9 @@ target_link_libraries(pwCrackerGUI PRIVATE Qt6::Widgets)
 
 add_executable(pwCrackerCLI
   mainCLI.cpp
+  cracker.cpp
   )
 target_include_directories(pwCrackerCLI PUBLIC "${PROJECT_SOURCE_DIR}")
 target_compile_features(pwCrackerCLI PUBLIC cxx_std_23)
 target_link_libraries(pwCrackerCLI PRIVATE OpenSSL::SSL)
 target_link_libraries(pwCrackerCLI PRIVATE sharedComponents)
-target_link_libraries(pwCrackerCLI PRIVATE Qt6::Core)
-target_link_libraries(pwCrackerCLI PRIVATE Qt6::Widgets)
