@@ -1,5 +1,6 @@
 #include "pwCracker/cracker.h"
 #include "srcShared/openSSL_EVP.h"
+#include <format>
 #include <iostream>
 #include <thread>
 
@@ -19,7 +20,6 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   std::mutex boolMutex;
   std::vector<std::thread> threads(numThreads);
   while (hashedPW.hasLine()) {
-    std::cout << limiter << "\n";
     volatile bool foundPW = false;
     int start = 0;
     int end = start + amountPerThread;
@@ -47,6 +47,8 @@ void crackFunc(hashMethods hashMethod, const std::string &hashedPW,
   EVP_Hash hasher(hashMethod);
   for (int i = start; i < end; i++) {
     if (hashedPW == hasher.hashString(commonPW.at(i))) {
+      std::cout << std::format("Hash: {}\nPassword: {}\nLoops: {}\n", hashedPW,
+                               commonPW.at(i), i - start);
       std::scoped_lock lock(boolMutex);
       foundPW = true;
       return;
