@@ -6,6 +6,8 @@
 
 #define limit 4
 
+//TODO: Dont delete the threads, maybe just give new info and signal that its ready
+// Dont need to recreate the EVP_HASH as well then
 void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
                         const int numThreads) {
   std::vector<std::string> pw;

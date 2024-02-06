@@ -6,6 +6,7 @@
 #include <cstring>
 #include <format>
 #include <iostream>
+#include <optional>
 #include <regex>
 
 void userMenu::menu(void) {
@@ -49,15 +50,16 @@ int userMenu::validateInput(std::string input) {
 
 bool userMenu::attemptLogin(void) {
   std::string userName = this->getUserLine("Enter UserName: ");
-  std::string line = this->findUser(userName);
-  if (line == "") {
+  auto line = this->findUser(userName);
+  if (!line.has_value()) {
     std::cout << "Invalid username\n";
     return false;
   }
   std::string password = this->getUserLine("Enter Password: ");
-  std::string salt = line.substr(line.find_last_of(',') + 1);
-  std::string hash = line.substr(line.find_first_of(',') + 1,
-                                 line.find_last_of(',') - userName.size() - 1);
+  std::string salt = line.value().substr(line.value().find_last_of(',') + 1);
+  std::string hash =
+      line.value().substr(line.value().find_first_of(',') + 1,
+                          line.value().find_last_of(',') - userName.size() - 1);
   if (this->verifyPW(hash, salt, password)) {
     std::cout << "Valid login\n";
     return true;
@@ -121,7 +123,7 @@ bool userMenu::validatePW(const std::string &password) {
 }
 
 bool userMenu::validateUserName(const std::string &userName) {
-  if (this->findUser(userName) != "") {
+  if (this->findUser(userName).has_value()) {
     std::cout << "Username is taken\n";
     return false;
   }
@@ -165,7 +167,7 @@ bool userMenu::createUser(void) {
       "{},{},{}", userName, hasher.hashString(password + salt), salt));
 }
 
-std::string userMenu::findUser(const std::string &userName) {
+std::optional<std::string> userMenu::findUser(const std::string &userName) {
   usersFile.resetStreamPos();
   while (usersFile.hasLine()) {
     std::string line = usersFile.readLine();
@@ -176,7 +178,7 @@ std::string userMenu::findUser(const std::string &userName) {
     }
   }
   usersFile.resetStreamPos();
-  return "";
+  return std::nullopt;
 }
 
 bool userMenu::verifyPW(const std::string &hash, const std::string &salt,

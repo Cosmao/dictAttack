@@ -3,6 +3,7 @@
 
 #include "srcShared/io.h"
 #include "srcShared/openSSL_EVP.h"
+#include <optional>
 #include <string>
 
 class userMenu {
@@ -18,7 +19,7 @@ private:
   bool validatePW(const std::string &password);
   std::string generateSalt(const std::string &userName);
   std::string getUserLine(const std::string &outputText);
-  std::string findUser(const std::string &userName);
+  std::optional<std::string> findUser(const std::string &userName);
   bool verifyPW(const std::string &hash, const std::string &salt,
                 const std::string &password);
 
