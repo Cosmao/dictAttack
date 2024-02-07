@@ -53,6 +53,9 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     end += amountPerThread + 1;
   }
   int limiter = 0;
+  // NOTE: Cba to make a proper signal that all threads are ready to start
+  // recieving data so just a small sleep
+  sleep(1);
   while (hashedPW.hasLine()) {
     std::unique_lock<std::mutex> cLock(*tInfo->condMutex);
     std::string sHash = hashedPW.readLine();
@@ -72,6 +75,7 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     std::cout << "Got exclusive lock\n";
     std::cout << std::format("Hash: {}\nPW: {}\nFrom main\n", sHash,
                              *tInfo->result->password);
+    free(tInfo->result->password);
     tInfo->sharedMutex->unlock();
     std::cout << "Unlocked shared mutex\n";
     limiter++;
