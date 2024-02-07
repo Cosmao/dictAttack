@@ -10,45 +10,31 @@
 
 #define limit 4
 
-// TODO: Dont delete the threads, maybe just give new info and signal that its
-// ready
-//  Dont need to recreate the EVP_HASH as well then
 void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
                         const int numThreads) {
   std::vector<std::string> pw;
   hashedPW.resetStreamPos();
   commonPW.resetStreamPos();
+  std::cout << "Reading in text to hash\n";
   while (commonPW.hasLine()) {
     std::string line = commonPW.readLine();
     pw.push_back(line);
   }
 
-  int amountPerThread = pw.size() / numThreads;
-
   crackResult *result = (crackResult *)calloc(1, sizeof(crackResult));
   threadInfo *tInfo = (threadInfo *)calloc(1, sizeof(threadInfo));
-  std::mutex *tMutex = (std::mutex *)malloc(sizeof(std::mutex));
-  new (tMutex) std::mutex();
-  std::mutex *condMutex = (std::mutex *)malloc(sizeof(std::mutex));
-  new (condMutex) std::mutex();
-  std::condition_variable *cvNextHash =
-      (std::condition_variable *)malloc(sizeof(std::condition_variable));
-  new (cvNextHash) std::condition_variable();
-  std::condition_variable *cvHashFound =
-      (std::condition_variable *)malloc(sizeof(std::condition_variable));
-  new (cvHashFound) std::condition_variable();
-  std::shared_mutex *sMutex =
-      (std::shared_mutex *)malloc(sizeof(std::shared_mutex));
-  new (sMutex) std::shared_mutex();
-  std::condition_variable_any *cvAny = (std::condition_variable_any *)malloc(
-      sizeof(std::condition_variable_any));
-  new (cvAny) std::condition_variable_any();
-  tInfo->condNextHash = cvNextHash;
+
+  std::mutex *tMutex = new std::mutex();
+  std::mutex *condMutex = new std::mutex();
+  std::condition_variable *cvHashFound = new std::condition_variable();
+  std::shared_mutex *sMutex = new std::shared_mutex();
+  std::condition_variable_any *cvAny = new std::condition_variable_any();
+
   tInfo->condHashFound = cvHashFound;
-  tInfo->condAnyNextHash = cvAny; //
-  tInfo->tInfoMutex = tMutex; //
-  tInfo->condMutex = condMutex; //
-  tInfo->sharedMutex = sMutex; //
+  tInfo->condAnyNextHash = cvAny;
+  tInfo->tInfoMutex = tMutex;
+  tInfo->condMutex = condMutex;
+  tInfo->sharedMutex = sMutex;
   tInfo->contine = true;
   tInfo->foundPW = false;
   tInfo->result = result;
@@ -56,6 +42,7 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   std::vector<std::thread> threads(numThreads);
   int id = 0;
   int start = 0;
+  int amountPerThread = pw.size() / numThreads;
   int end = start + amountPerThread;
   std::cout << std::format("Num PW: {}\n", pw.size());
   for (auto &t : threads) {
@@ -105,6 +92,12 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   }
 
   free(result);
+  free(tInfo->tInfoMutex);
+  free(tInfo->sharedMutex);
+  free(tInfo->condAnyNextHash);
+  free(tInfo->condMutex);
+  free(tInfo->condHashFound);
+  free(tInfo);
   return;
 }
 

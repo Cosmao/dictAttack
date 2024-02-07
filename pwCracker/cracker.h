@@ -18,7 +18,6 @@ typedef struct {
   std::mutex *tInfoMutex;
   std::mutex *condMutex;
   std::shared_mutex *sharedMutex;
-  std::condition_variable *condNextHash;
   std::condition_variable *condHashFound;
   std::condition_variable_any *condAnyNextHash;
   std::string *hash;
