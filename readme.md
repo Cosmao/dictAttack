@@ -6,9 +6,11 @@ För att hasha en fil förväntar sig CLI 2 argument, första är vilken fil den
 1 = SHA256
 2 = SHA512
 ~~~
-filen att hasha måste vara i formatet 
+Filen att hasha måste vara i formatet 
 ~~~
-{lösenord},{salt}\n
+lösenord,salt
+lösenord,salt
+lösenord,salt
 ~~~
 
 Att cracka lösenord kräver 4 argument, en fil med formatet över, en textfil med vanliga lösenord (rockyou t.ex), hur många tråda och vilken typ av hash det är (se ovan). 
