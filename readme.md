@@ -23,7 +23,7 @@ Exempel för att köra hashern på clearTextSalt.txt med SHA512. Output blir
 appendat med Hashed.txt
 
 ```
-pwCrackerCLI ../../../clearTextSalt.txt 2
+pwCrackerCLI clearTextSalt.txt 2
 ```
 
 Att cracka lösenord kräver 4 argument, en fil med formatet över, en textfil med
@@ -34,7 +34,7 @@ Exempel för att köra pwCrackerCLI på hashSaltMD5.txt med rockyou.txt som fil 
 testa emot, 16 trådar och MD5.
 
 ```
-pwCrackerCLI  ../../../hashSaltMD5.txt ../../../rockyou.txt 16 0
+pwCrackerCLI  hashSaltMD5.txt rockyou.txt 16 0
 ```
 
 ## Info
