@@ -28,11 +28,12 @@ typedef struct {
   volatile bool foundPW;
 } threadInfo;
 
-void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
-                        const int threads, const hashMethods hashMethod);
+void crackThreadHandler(io_file &hashedPW, io_file &commonPW, const int threads,
+                        const hashMethods hashMethod);
 void crackFunc(hashMethods hashMethod, const std::vector<std::string> &commonPW,
-               const int start, const int end, std::shared_ptr<threadInfo> tInfo, const int threadID);
+               const int start, const int end,
+               std::shared_ptr<threadInfo> tInfo);
 void crackPW(EVP_Hash &hasher, const std::vector<std::string> &commonPW,
-             const int start, const int end, std::shared_ptr<threadInfo> tInfo, const int threadID);
+             const int start, const int end, std::shared_ptr<threadInfo> tInfo);
 
 #endif // !cracker_h
