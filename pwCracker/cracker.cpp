@@ -33,15 +33,17 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   std::unique_ptr<std::shared_mutex> sMutex(new std::shared_mutex());
   std::unique_ptr<std::condition_variable_any> cvAny(
       new std::condition_variable_any());
+  std::unique_ptr<std::shared_mutex> workingThreads(new std::shared_mutex());
 
-  tInfo->condHashFound = &cvHashFound;
-  tInfo->condAnyNextHash = &cvAny;
+  tInfo->condThreadStartedWorking = &cvHashFound;
+  tInfo->condAnyNextHashAvailable = &cvAny;
   tInfo->tInfoMutex = &tMutex;
   tInfo->condMutex = &condMutex;
-  tInfo->sharedMutex = &sMutex;
+  tInfo->nextHashSharedMutex = &sMutex;
   tInfo->contine = true;
   tInfo->foundPW = false;
   tInfo->result = &result;
+  tInfo->threadWorkingMutex = &workingThreads;
 
   std::vector<std::thread> threads(numThreads);
   int start = 0;
@@ -64,30 +66,43 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     std::string sHash = line.substr(0, line.find_first_of(','));
     std::string sSalt = line.substr(line.find_first_of(',') + 1);
     {
+      // std::cout << "locking tInfo\n";
       std::lock_guard<std::mutex> lock(*tInfo->tInfoMutex->get());
       tInfo->foundPW = false;
       tInfo->hash = &sHash;
       tInfo->salt = &sSalt;
+      // std::cout << "unlocking tInfo\n";
     }
-    tInfo->condAnyNextHash->get()->notify_all();
-    tInfo->condHashFound->get()->wait(cLock);
-    tInfo->sharedMutex->get()->lock();
-    std::cout << std::format("Hash: {}\nPW: {}\nLoops: {}\nFrom main\n", sHash,
-                             *tInfo->result->get()->password,
-                             tInfo->result->get()->loops);
-    free(tInfo->result->get()->password);
-    tInfo->sharedMutex->get()->unlock();
+    // std::cout << "Main thread release\n";
+    tInfo->condAnyNextHashAvailable->get()->notify_all();
+    // std::cout << "Main thread awaiting thread started working release\n";
+    tInfo->condThreadStartedWorking->get()->wait(cLock);
+    // std::cout << "Main thread waiting for threads to finish\n";
+    tInfo->threadWorkingMutex->get()->lock();
+    // std::cout << "Main thread got cond\nAwaiting exclusive lock\n";
+    tInfo->nextHashSharedMutex->get()->lock();
+    // std::cout << "Got exclusive lock\n";
+    if (tInfo->foundPW) {
+      std::cout << std::format("Hash: {}\nPW: {}\nLoops: {}\nFrom main\n",
+                               sHash, *tInfo->result->get()->password,
+                               tInfo->result->get()->loops);
+      free(tInfo->result->get()->password);
+    }
+    tInfo->nextHashSharedMutex->get()->unlock();
+    tInfo->threadWorkingMutex->get()->unlock();
+    // std::cout << "Unlocked shared mutex\n";
     limiter++;
   }
 
   {
+    //NOTE: scoped just for the scoped lock
     std::lock_guard<std::mutex> lock(*tInfo->tInfoMutex->get());
     tInfo->contine = false;
     tInfo->foundPW = true;
   }
 
   std::cout << "Notified all threads and waiting for them to terminate\n";
-  tInfo->condAnyNextHash->get()->notify_all();
+  tInfo->condAnyNextHashAvailable->get()->notify_all();
   for (auto &t : threads) {
     t.join();
   }
@@ -101,13 +116,22 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
 }
 
 void crackFunc(hashMethods hashMethod, const std::vector<std::string> &commonPW,
-               int start, int end, std::shared_ptr<threadInfo> tInfo) {
+               const int start, const int end,
+               std::shared_ptr<threadInfo> tInfo, const int threadID) {
   EVP_Hash hasher(hashMethod);
-  std::shared_lock<std::shared_mutex> lock(*tInfo->sharedMutex->get());
+  std::shared_lock<std::shared_mutex> lock(*tInfo->nextHashSharedMutex->get());
   while (true) {
-    tInfo->condAnyNextHash->get()->wait(lock);
+    // std::cout << std::format("Thread {} waiting signal\n", threadID);
+    tInfo->condAnyNextHashAvailable->get()->wait(lock);
     if (tInfo->contine) {
-      crackPW(hasher, commonPW, start, end, tInfo);
+      // std::cout << std::format("Thread {} trying to lock_shared\n", threadID);
+      tInfo->threadWorkingMutex->get()->lock_shared();
+      // std::cout << std::format("Thread {} notify_one\n", threadID);
+      tInfo->condThreadStartedWorking->get()->notify_one();
+      // std::cout << std::format("Thread {} starting cracking hash {}\n",
+      //                          threadID, *tInfo->hash);
+      crackPW(hasher, commonPW, start, end, tInfo, threadID);
+      tInfo->threadWorkingMutex->get()->unlock_shared();
     } else {
       return;
     }
@@ -116,17 +140,18 @@ void crackFunc(hashMethods hashMethod, const std::vector<std::string> &commonPW,
 }
 
 void crackPW(EVP_Hash &hasher, const std::vector<std::string> &commonPW,
-             int start, int end, std::shared_ptr<threadInfo> tInfo) {
+             const int start, const int end, std::shared_ptr<threadInfo> tInfo,
+             const int threadID) {
   for (int i = start; i < end; i++) {
     if (*tInfo->hash == hasher.hashString(commonPW.at(i) + *tInfo->salt)) {
       std::lock_guard<std::mutex> lock(*tInfo->tInfoMutex->get());
       tInfo->foundPW = true;
       tInfo->result->get()->password = new std::string(commonPW.at(i));
       tInfo->result->get()->loops = i - start;
-      tInfo->condHashFound->get()->notify_one();
       return;
     } else if (tInfo->foundPW == true) {
       return;
     }
   }
+  std::cout << std::format("Thread {} didnt find the hash!\n", threadID);
 }
