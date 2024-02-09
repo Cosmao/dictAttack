@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
   std::string argTwo = argv[2];
   io_file commonPW(argTwo);
   io_file hashedPW(argOne);
+  std::cout << "\n";
   if (!commonPW.is_good()) {
     std::cout << "PW filepath bad!\n";
     return 0;
