@@ -30,7 +30,7 @@ typedef struct {
 void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
                         const int threads, const hashMethods hashMethod);
 void crackFunc(hashMethods hashMethod, const std::vector<std::string> &commonPW,
-               int start, int end, std::shared_ptr<threadInfo> tInfo, int threadID);
+               int start, int end, std::shared_ptr<threadInfo> tInfo);
 void crackPW(EVP_Hash &hasher, const std::vector<std::string> &commonPW,
              int start, int end, std::shared_ptr<threadInfo> tInfo);
 
