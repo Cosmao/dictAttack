@@ -46,15 +46,12 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   tInfo->threadWorkingMutex = &workingThreads;
 
   std::vector<std::thread> threads(numThreads);
-  int id = 0;
   int start = 0;
   int amountPerThread = pw.size() / numThreads;
   int end = start + amountPerThread;
   std::cout << std::format("Num PW: {}\n", pw.size());
   for (auto &t : threads) {
-    t = std::thread(crackFunc, hashMethod, std::ref(pw), start, end, tInfo, id);
-    std::cout << std::format("Thread {}: {}-{}\n", id, start, end);
-    id++;
+    t = std::thread(crackFunc, hashMethod, std::ref(pw), start, end, tInfo);
     start += amountPerThread + 1;
     end += amountPerThread + 1;
   }
@@ -95,14 +92,6 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     tInfo->threadWorkingMutex->get()->unlock();
     // std::cout << "Unlocked shared mutex\n";
     limiter++;
-    if (limiter == limit) {
-      std::cout << "Testing limit hit terminating threads\n";
-      std::lock_guard<std::mutex> lock(*tInfo->tInfoMutex->get());
-      tInfo->contine = false;
-      tInfo->foundPW = true;
-      break;
-      ;
-    }
   }
 
   {
