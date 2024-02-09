@@ -7,7 +7,6 @@
 
 //NOTE: I actually hate everything about this main function..
 int main(int argc, char *argv[]) {
-  std::cout << argc;
   if (argc == 3) {
     std::string filePath = argv[1];
     io_file fileToHash(filePath);
@@ -38,7 +37,6 @@ int main(int argc, char *argv[]) {
   std::string argTwo = argv[2];
   io_file commonPW(argTwo);
   io_file hashedPW(argOne);
-  std::cout << "\n";
   if (!commonPW.is_good()) {
     std::cout << "PW filepath bad!\n";
     return 0;

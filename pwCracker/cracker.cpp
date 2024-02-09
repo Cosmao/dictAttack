@@ -50,18 +50,24 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   int amountPerThread = pw.size() / numThreads;
   int end = start + amountPerThread;
   std::cout << std::format("Num PW: {}\n", pw.size());
+  int tID = 0;
   for (auto &t : threads) {
     t = std::thread(crackFunc, hashMethod, std::ref(pw), start, end, tInfo);
+    std::cout << std::format("Thread {} {}-{}\n", tID, start, end);
     start += amountPerThread + 1;
     end += amountPerThread + 1;
+    if((unsigned long)end >= pw.size()){
+      end = pw.size() - 1;
+    }
+    tID++;
   }
   int limiter = 0;
   // NOTE: Cba to make a proper signal that all threads are ready to start
   // recieving data so just a small sleep
   sleep(1);
   auto startTime = std::chrono::high_resolution_clock::now();
+  std::unique_lock<std::mutex> cLock(*tInfo->condMutex->get());
   while (hashedPW.hasLine()) {
-    std::unique_lock<std::mutex> cLock(*tInfo->condMutex->get());
     std::string line = hashedPW.readLine();
     std::string sHash = line.substr(0, line.find_first_of(','));
     std::string sSalt = line.substr(line.find_first_of(',') + 1);
@@ -73,8 +79,11 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     }
     tInfo->condAnyNextHashAvailable->get()->notify_all();
     tInfo->condThreadStartedWorking->get()->wait(cLock);
-    tInfo->threadWorkingMutex->get()->lock();
+    std::cout << "Main got working cond\n";
     tInfo->nextHashSharedMutex->get()->lock();
+    std::cout << "Main got exlusive lock 1\n";
+    tInfo->threadWorkingMutex->get()->lock();
+    std::cout << "Main got exlusive lock 2\n";
     if (tInfo->foundPW) {
       std::cout << std::format("Hash: {}\nPW: {}\nLoops: {}\n", sHash,
                                *tInfo->result->get()->password,
@@ -83,8 +92,8 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     } else {
       std::cout << std::format("Couldnt find PW for hash: {}\n", sHash);
     }
-    tInfo->nextHashSharedMutex->get()->unlock();
     tInfo->threadWorkingMutex->get()->unlock();
+    tInfo->nextHashSharedMutex->get()->unlock();
     limiter++;
   }
 
