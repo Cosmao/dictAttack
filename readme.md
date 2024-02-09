@@ -21,14 +21,11 @@ Att cracka lösenord kräver 4 argument, en fil med formatet över, en textfil m
 vanliga lösenord (rockyou t.ex), hur många tråda och vilken typ av hash det är
 (se ovan).
 
-Exempel:
+Exempel för att köra pwCrackerCLI på hashSaltMD5.txt med rockyou.txt som fil att testa emot, 16 trådar och MD5.
 
 ```
 pwCrackerCLI  ../../../hashSaltMD5.txt ../../../rockyou.txt 16 0
 ```
-
-För att börja knäcka hashedSaltMD5.txt som ligger 3 mappar upp med hjälp av
-rockyou, använder 16 trådar och MD5
 
 ## Info
 
