@@ -11,7 +11,8 @@
 void hashFile(char **argv) {
   std::string filePath = argv[1];
   io_file fileToHash(filePath);
-  io_file outputFile(filePath + "Hashed.txt");
+  io_file outputFile(filePath.substr(filePath.find_first_of('.')) +
+                     "Hashed.txt");
   if (fileToHash.is_good() && outputFile.is_good()) {
     // NOTE: This is so awful, but lets me to the different hash methods
     hashMethods inputMethod = (hashMethods)std::stoi(argv[2]);

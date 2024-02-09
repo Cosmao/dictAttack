@@ -17,11 +17,21 @@ lösenord,salt
 lösenord,salt
 ```
 
+clearTextSalt.txt i repo'n följer formatet.
+
+Exempel för att köra hashern på clearTextSalt.txt med SHA512. Output blir
+appendat med Hashed.txt
+
+```
+pwCrackerCLI ../../../clearTextSalt.txt 2
+```
+
 Att cracka lösenord kräver 4 argument, en fil med formatet över, en textfil med
 vanliga lösenord (rockyou t.ex), hur många tråda och vilken typ av hash det är
 (se ovan).
 
-Exempel för att köra pwCrackerCLI på hashSaltMD5.txt med rockyou.txt som fil att testa emot, 16 trådar och MD5.
+Exempel för att köra pwCrackerCLI på hashSaltMD5.txt med rockyou.txt som fil att
+testa emot, 16 trådar och MD5.
 
 ```
 pwCrackerCLI  ../../../hashSaltMD5.txt ../../../rockyou.txt 16 0
