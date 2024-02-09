@@ -9,9 +9,10 @@
 // handling and flags for everything but it'll work for now
 
 void hashFile(char **argv) {
+  std::cout << "Hashing file\n";
   std::string filePath = argv[1];
   io_file fileToHash(filePath);
-  io_file outputFile(filePath.substr(filePath.find_first_of('.')) +
+  io_file outputFile(filePath.substr(0, filePath.find_last_of('.')) +
                      "Hashed.txt");
   if (fileToHash.is_good() && outputFile.is_good()) {
     // NOTE: This is so awful, but lets me to the different hash methods
@@ -27,10 +28,12 @@ void hashFile(char **argv) {
       outputFile.writeLine(std::format("{},{}", hash, sSalt));
     }
   }
+  std::cout << "Hashing done\n";
   return;
 }
 
 void crackFile(char **argv) {
+  std::cout << "Cracking file\n";
   std::string argOne = argv[1];
   std::string argTwo = argv[2];
   io_file commonPW(argTwo);
@@ -50,6 +53,7 @@ void crackFile(char **argv) {
   const int numThreads = std::stoi(argv[3]);
   const hashMethods hashMethod = (hashMethods)std::stoi(argv[4]);
   crackThreadHandler(hashedPW, commonPW, numThreads, hashMethod);
+  std::cout << "Cracking done\n";
   return;
 }
 
