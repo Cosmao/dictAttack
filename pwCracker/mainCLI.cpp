@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 
+//NOTE: I actually hate everything about this main function..
 int main(int argc, char *argv[]) {
   std::cout << argc;
   if (argc == 3) {
@@ -29,7 +30,7 @@ int main(int argc, char *argv[]) {
   }
   if (argc != 5) {
     std::cout << "Requires 4 arguments, hashed passwords, common PW file,"
-                 "number of threads and hashMethods(0-2)\n";
+                 "number of threads and hashMethods(0-2)(0 = MD5, 1 = SHA256, 2 = SHA512)\n";
     std::cout << argc << "\n";
     return 0;
   }

@@ -81,8 +81,9 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     std::cout << "Main thread got cond\nAwaiting exclusive lock\n";
     tInfo->sharedMutex->get()->lock();
     std::cout << "Got exclusive lock\n";
-    std::cout << std::format("Hash: {}\nPW: {}\nFrom main\n", sHash,
-                             *tInfo->result->get()->password);
+    std::cout << std::format("Hash: {}\nPW: {}\nLoops: {}\nFrom main\n", sHash,
+                             *tInfo->result->get()->password,
+                             tInfo->result->get()->loops);
     free(tInfo->result->get()->password);
     tInfo->sharedMutex->get()->unlock();
     std::cout << "Unlocked shared mutex\n";
@@ -110,7 +111,8 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   }
 
   auto endTime = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+      endTime - startTime);
   std::cout << std::format("Cracked {} passwords in {}\n", limiter, duration);
 
   return;
