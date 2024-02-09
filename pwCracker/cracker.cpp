@@ -26,42 +26,37 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
   std::unique_ptr<crackResult> result(new crackResult);
   std::shared_ptr<threadInfo> tInfo(new threadInfo);
 
-  std::unique_ptr<std::mutex> tMutex(new std::mutex());
-  std::unique_ptr<std::mutex> condMutex(new std::mutex());
-  std::unique_ptr<std::condition_variable> cvHashFound(
-      new std::condition_variable());
-  std::unique_ptr<std::shared_mutex> sMutex(new std::shared_mutex());
-  std::unique_ptr<std::condition_variable_any> cvAny(
-      new std::condition_variable_any());
-  std::unique_ptr<std::shared_mutex> workingThreads(new std::shared_mutex());
-
-  tInfo->condThreadStartedWorking = &cvHashFound;
-  tInfo->condAnyNextHashAvailable = &cvAny;
-  tInfo->tInfoMutex = &tMutex;
-  tInfo->condMutex = &condMutex;
-  tInfo->nextHashSharedMutex = &sMutex;
+  tInfo->result = new std::unique_ptr<crackResult>(new crackResult);
+  tInfo->tInfoMutex = new std::unique_ptr<std::mutex>(new std::mutex());
+  tInfo->condMutex = new std::unique_ptr<std::mutex>(new std::mutex());
+  tInfo->nextHashSharedMutex =
+      new std::unique_ptr<std::shared_mutex>(new std::shared_mutex());
+  tInfo->threadWorkingMutex =
+      new std::unique_ptr<std::shared_mutex>(new std::shared_mutex());
+  tInfo->condThreadStartedWorking =
+      new std::unique_ptr<std::condition_variable>(
+          new std::condition_variable());
+  tInfo->condAnyNextHashAvailable =
+      new std::unique_ptr<std::condition_variable_any>(
+          new std::condition_variable_any());
   tInfo->contine = true;
   tInfo->foundPW = false;
-  tInfo->result = &result;
-  tInfo->threadWorkingMutex = &workingThreads;
 
   std::vector<std::thread> threads(numThreads);
   int start = 0;
   int amountPerThread = pw.size() / numThreads;
   int end = start + amountPerThread;
-  std::cout << std::format("Num PW: {}\n", pw.size());
-  int tID = 0;
+  // NOTE: This will fail if you give it more threads than commonPW!
   for (auto &t : threads) {
     t = std::thread(crackFunc, hashMethod, std::ref(pw), start, end, tInfo);
-    std::cout << std::format("Thread {} {}-{}\n", tID, start, end);
     start += amountPerThread + 1;
     end += amountPerThread + 1;
     if ((unsigned long)end >= pw.size()) {
       end = pw.size() - 1;
     }
-    tID++;
   }
-  int limiter = 0;
+  int numCrackedPW = 0;
+  int numFailedCrackedPW = 0;
   // NOTE: Cba to make a proper signal that all threads are ready to start
   // recieving data so just a small sleep
   sleep(1);
@@ -86,12 +81,13 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
                                *tInfo->result->get()->password,
                                tInfo->result->get()->loops);
       free(tInfo->result->get()->password);
+      numCrackedPW++;
     } else {
       std::cout << std::format("Couldnt find PW for hash: {}\n", sHash);
+      numFailedCrackedPW++;
     }
     tInfo->threadWorkingMutex->get()->unlock();
     tInfo->nextHashSharedMutex->get()->unlock();
-    limiter++;
   }
 
   {
@@ -100,16 +96,18 @@ void crackThreadHandler(io_file &hashedPW, io_file &commonPW,
     tInfo->foundPW = true;
   }
 
-  std::cout << "Notified all threads and waiting for them to terminate\n";
   tInfo->condAnyNextHashAvailable->get()->notify_all();
   for (auto &t : threads) {
     t.join();
+    // NOTE: Was having issues with threads getting stuck
+    tInfo->condAnyNextHashAvailable->get()->notify_all();
   }
 
   auto endTime = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
       endTime - startTime);
-  std::cout << std::format("Cracked {} passwords in {}\n", limiter, duration);
+  std::cout << std::format("Cracked {} passwords in {}\nFailed to crack {}\n",
+                           numCrackedPW, duration, numFailedCrackedPW);
 
   return;
 }
