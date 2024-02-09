@@ -1,0 +1,10 @@
+password,abc123
+123456,456789
+qwerty,asdfgh
+letmein,13579
+monkey,banana
+1234567890,0987654321
+password1,p@ssw0rd
+sunshine,sunshine123
+access,granted
+shadow,1234567890
